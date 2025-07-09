@@ -75,11 +75,32 @@ const LocationSection = () => {
     });
   };
 
-  const handleSiteVisitSubmit = (e: React.FormEvent) => {
+  const handleSiteVisitSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
+    const ENTRY_IDS = {
+      name: "entry.1338687725",
+      phone: "entry.1492404407",
+      email: "entry.1765571584",
+      formName: "entry.1294608166",
+      consent: "entry.182177265",
+    };
+    const formData = new FormData();
+    formData.append(ENTRY_IDS.name, siteVisitForm.name);
+    formData.append(ENTRY_IDS.phone, siteVisitForm.phone);
+    formData.append(ENTRY_IDS.email, siteVisitForm.email);
+    formData.append(ENTRY_IDS.formName, "Schedule Site Visit");
     if (siteVisitForm.consent) {
-      setSiteVisitSubmitted(true);
+      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
     }
+    try {
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (error) {}
+    setSiteVisitSubmitted(true);
   };
 
   const closeSiteVisitModal = () => {
@@ -96,11 +117,32 @@ const LocationSection = () => {
     });
   };
 
-  const handleMapsSubmit = (e: React.FormEvent) => {
+  const handleMapsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
+    const ENTRY_IDS = {
+      name: "entry.1338687725",
+      phone: "entry.1492404407",
+      email: "entry.1765571584",
+      formName: "entry.1294608166",
+      consent: "entry.182177265",
+    };
+    const formData = new FormData();
+    formData.append(ENTRY_IDS.name, mapsForm.name);
+    formData.append(ENTRY_IDS.phone, mapsForm.phone);
+    formData.append(ENTRY_IDS.email, mapsForm.email);
+    formData.append(ENTRY_IDS.formName, "Get Location on WhatsApp");
     if (mapsForm.consent) {
-      setMapsSubmitted(true);
+      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
     }
+    try {
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (error) {}
+    setMapsSubmitted(true);
   };
 
   const closeMapsModal = () => {
@@ -370,8 +412,9 @@ const LocationSection = () => {
                             required
                             className="accent-primary"
                           />
-                          I agree to be contacted regarding my enquiry.
+                          I agree to be contacted regarding my enquiry
                         </label>
+                        <input type="hidden" name="formName" value="Schedule Site Visit" />
                         <button
                           type="submit"
                           className="bg-[#CF2E2E] text-white font-bold py-3 rounded-lg hover:bg-[#b82828] transition-colors text-lg mt-2 disabled:opacity-60"
@@ -458,8 +501,9 @@ const LocationSection = () => {
                             required
                             className="accent-primary"
                           />
-                          I agree to be contacted regarding my enquiry.
+                          I agree to be contacted regarding my enquiry
                         </label>
+                        <input type="hidden" name="formName" value="Get Location on WhatsApp" />
                         <button
                           type="submit"
                           className="bg-[#CF2E2E] text-white font-bold py-3 rounded-lg hover:bg-[#b82828] transition-colors text-lg mt-2 disabled:opacity-60"

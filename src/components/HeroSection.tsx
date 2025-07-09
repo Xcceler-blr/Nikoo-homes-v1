@@ -18,10 +18,37 @@ const HeroSection = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Google Form integration
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
+    const ENTRY_IDS = {
+      name: "entry.1338687725",
+      phone: "entry.1492404407",
+      email: "entry.1765571584",
+      formName: "entry.1294608166",
+      consent: "entry.182177265",
+    };
+    const formData = new FormData();
+    formData.append(ENTRY_IDS.name, form.name);
+    formData.append(ENTRY_IDS.phone, form.phone);
+    formData.append(ENTRY_IDS.email, form.email);
+    // Add form name as a hidden field
+    formData.append(ENTRY_IDS.formName, "Schedule Visit");
+    // Only append consent if checked, and use the label as value
+    if (form.consent) {
+      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
+    }
+    try {
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (error) {
+      // Optionally handle error
+    }
     setSubmitted(true);
-    // Optionally, handle form data here (e.g., send to API)
   };
 
   const closeModal = () => {
@@ -41,12 +68,32 @@ const HeroSection = () => {
     });
   };
 
-  const handleBrochureSubmit = (e: React.FormEvent) => {
+  const handleBrochureSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
+    const ENTRY_IDS = {
+      name: "entry.1338687725",
+      phone: "entry.1492404407",
+      email: "entry.1765571584",
+      formName: "entry.1294608166",
+      consent: "entry.182177265",
+    };
+    const formData = new FormData();
+    formData.append(ENTRY_IDS.name, brochureForm.name);
+    formData.append(ENTRY_IDS.phone, brochureForm.phone);
+    formData.append(ENTRY_IDS.email, brochureForm.email);
+    formData.append(ENTRY_IDS.formName, "Download Brochure");
     if (brochureForm.consent) {
-      setBrochureSubmitted(true);
-      // Optionally, handle form data here (e.g., send to API)
+      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
     }
+    try {
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (error) {}
+    setBrochureSubmitted(true);
   };
 
   const closeBrochureModal = () => {
@@ -184,6 +231,7 @@ const HeroSection = () => {
                     required
                     className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
+                  <input type="hidden" name="formName" value="Schedule Visit" />
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
@@ -193,7 +241,7 @@ const HeroSection = () => {
                       required
                       className="accent-primary"
                     />
-                    I agree to be contacted regarding my enquiry.
+                    I agree to be contacted regarding my enquiry
                   </label>
                   <button
                     type="submit"
@@ -267,6 +315,7 @@ const HeroSection = () => {
                     required
                     className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
+                  <input type="hidden" name="formName" value="Download Brochure" />
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
@@ -276,7 +325,7 @@ const HeroSection = () => {
                       required
                       className="accent-primary"
                     />
-                    I agree to be contacted regarding my enquiry.
+                    I agree to be contacted regarding my enquiry
                   </label>
                   <button
                     type="submit"

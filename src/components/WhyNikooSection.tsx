@@ -11,6 +11,10 @@ const WhyNikooSection = () => {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", consent: false });
 
+  // State for inline enquiry form
+  const [enquiryForm, setEnquiryForm] = useState({ name: "", phone: "", email: "", consent: false });
+  const [enquirySubmitted, setEnquirySubmitted] = useState(false);
+
   useEffect(() => {
     if (open) {
       document.body.classList.add("overflow-hidden");
@@ -30,12 +34,68 @@ const WhyNikooSection = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
+    const ENTRY_IDS = {
+      name: "entry.1338687725",
+      phone: "entry.1492404407",
+      email: "entry.1765571584",
+      formName: "entry.1294608166",
+      consent: "entry.182177265",
+    };
+    const formData = new FormData();
+    formData.append(ENTRY_IDS.name, form.name);
+    formData.append(ENTRY_IDS.phone, form.phone);
+    formData.append(ENTRY_IDS.email, form.email);
+    formData.append(ENTRY_IDS.formName, "Enquiry Form");
     if (form.consent) {
-      setSubmitted(true);
-      // Optionally, handle form data here (e.g., send to API)
+      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
     }
+    try {
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (error) {}
+    setSubmitted(true);
+  };
+
+  const handleEnquiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setEnquiryForm({
+      ...enquiryForm,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleEnquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
+    const ENTRY_IDS = {
+      name: "entry.1338687725",
+      phone: "entry.1492404407",
+      email: "entry.1765571584",
+      formName: "entry.1294608166",
+      consent: "entry.182177265",
+    };
+    const formData = new FormData();
+    formData.append(ENTRY_IDS.name, enquiryForm.name);
+    formData.append(ENTRY_IDS.phone, enquiryForm.phone);
+    formData.append(ENTRY_IDS.email, enquiryForm.email);
+    formData.append(ENTRY_IDS.formName, "Enquiry Form");
+    if (enquiryForm.consent) {
+      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
+    }
+    try {
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (error) {}
+    setEnquirySubmitted(true);
   };
 
   const closeModal = () => {
@@ -134,6 +194,7 @@ const WhyNikooSection = () => {
                     required
                     className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
+                  <input type="hidden" name="formName" value="Enquiry Form" />
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
@@ -143,7 +204,7 @@ const WhyNikooSection = () => {
                       required
                       className="accent-primary"
                     />
-                    I agree to be contacted regarding my enquiry.
+                    I agree to be contacted regarding my enquiry
                   </label>
                   <button
                     type="submit"
@@ -198,33 +259,63 @@ const WhyNikooSection = () => {
 
           {/* Enquiry Form */}
           <div className="w-full max-w-6xl mx-auto mb-16">
-            <form id="nikoo-enquiry-form" className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/10 p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6"
-              style={{ boxSizing: 'border-box' }}
-              autoComplete="off"
-            >
-              <input
-                type="text"
-                placeholder="Name"
-                className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
-              />
-              <Button
-                size="lg"
-                className="px-8 py-2 text-lg font-bold shadow-lg bg-[#CF2E2E] text-white hover:bg-[#b82828] border-none flex items-center justify-center whitespace-nowrap"
-                type="submit"
-              >
-                Submit Enquiry
-              </Button>
-            </form>
+            {!enquirySubmitted ? (
+              <form id="nikoo-enquiry-form" className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/10 p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6" style={{ boxSizing: 'border-box' }} autoComplete="off" onSubmit={handleEnquirySubmit}>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={enquiryForm.name}
+                  onChange={handleEnquiryChange}
+                  required
+                  className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
+                />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone Number"
+                  value={enquiryForm.phone}
+                  onChange={handleEnquiryChange}
+                  required
+                  pattern="[0-9]{10,}"
+                  className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
+                />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={enquiryForm.email}
+                  onChange={handleEnquiryChange}
+                  required
+                  className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
+                />
+                <input type="hidden" name="formName" value="Enquiry Form" />
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    name="consent"
+                    checked={enquiryForm.consent}
+                    onChange={handleEnquiryChange}
+                    required
+                    className="accent-primary"
+                  />
+                  I agree to be contacted regarding my enquiry
+                </label>
+                <Button
+                  size="lg"
+                  className="px-8 py-2 text-lg font-bold shadow-lg bg-[#CF2E2E] text-white hover:bg-[#b82828] border-none flex items-center justify-center whitespace-nowrap"
+                  type="submit"
+                  disabled={!enquiryForm.consent}
+                >
+                  Submit Enquiry
+                </Button>
+              </form>
+            ) : (
+              <div className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/10 p-8 flex flex-col items-center justify-center min-h-[200px]">
+                <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
+                <p className="text-gray-700 text-center">We have received your enquiry and will contact you soon.</p>
+              </div>
+            )}
           </div>
 
           {/* Highlights Grid */}

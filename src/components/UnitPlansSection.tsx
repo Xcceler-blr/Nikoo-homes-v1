@@ -86,7 +86,10 @@ const UnitPlansSection = () => {
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [submittedIndex, setSubmittedIndex] = useState<number | null>(null);
-  const [form, setForm] = useState({ name: "", phone: "", email: "", consent: false });
+  // Replace single form state with separate states for each form
+  const [unitPlanForm, setUnitPlanForm] = useState({ name: "", phone: "", email: "", consent: false });
+  const [allPlansForm, setAllPlansForm] = useState({ name: "", phone: "", email: "", consent: false });
+  const [consultationForm, setConsultationForm] = useState({ name: "", phone: "", email: "", consent: false });
   const downloadRef = useRef<HTMLAnchorElement>(null);
   const [allPlansOpen, setAllPlansOpen] = useState(false);
   const [allPlansSubmitted, setAllPlansSubmitted] = useState(false);
@@ -94,74 +97,134 @@ const UnitPlansSection = () => {
   const [consultationOpen, setConsultationOpen] = useState(false);
   const [consultationSubmitted, setConsultationSubmitted] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Update handleChange for each form
+  const handleUnitPlanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setForm({
-      ...form,
+    setUnitPlanForm({
+      ...unitPlanForm,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+  const handleAllPlansChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setAllPlansForm({
+      ...allPlansForm,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+  const handleConsultationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setConsultationForm({
+      ...consultationForm,
       [name]: type === "checkbox" ? checked : value,
     });
   };
 
-  const handleSubmit = (e: React.FormEvent, idx: number) => {
+  // Update handleSubmit for each form
+  const handleUnitPlanSubmit = async (e: React.FormEvent, idx: number) => {
     e.preventDefault();
-    if (form.consent) {
-      setSubmittedIndex(idx);
-      setTimeout(() => {
-        // Trigger download after a short delay for UX
-        downloadRef.current?.click();
-      }, 800);
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
+    const ENTRY_IDS = {
+      name: "entry.1338687725",
+      phone: "entry.1492404407",
+      email: "entry.1765571584",
+      formName: "entry.1294608166",
+      consent: "entry.182177265",
+    };
+    const formData = new FormData();
+    formData.append(ENTRY_IDS.name, unitPlanForm.name);
+    formData.append(ENTRY_IDS.phone, unitPlanForm.phone);
+    formData.append(ENTRY_IDS.email, unitPlanForm.email);
+    formData.append(ENTRY_IDS.formName, `Download Floor Plan: ${unitPlans[idx].type}`);
+    if (unitPlanForm.consent) {
+      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
     }
+    try {
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (error) {}
+    setSubmittedIndex(idx);
+    setTimeout(() => {
+      downloadRef.current?.click();
+    }, 800);
+  };
+  const handleAllPlansSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
+    const ENTRY_IDS = {
+      name: "entry.1338687725",
+      phone: "entry.1492404407",
+      email: "entry.1765571584",
+      formName: "entry.1294608166",
+      consent: "entry.182177265",
+    };
+    const formData = new FormData();
+    formData.append(ENTRY_IDS.name, allPlansForm.name);
+    formData.append(ENTRY_IDS.phone, allPlansForm.phone);
+    formData.append(ENTRY_IDS.email, allPlansForm.email);
+    formData.append(ENTRY_IDS.formName, "Download All Plans");
+    if (allPlansForm.consent) {
+      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
+    }
+    try {
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (error) {}
+    setAllPlansSubmitted(true);
+    setTimeout(() => {
+      allPlansDownloadRef.current?.click();
+    }, 800);
+  };
+  const handleConsultationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
+    const ENTRY_IDS = {
+      name: "entry.1338687725",
+      phone: "entry.1492404407",
+      email: "entry.1765571584",
+      formName: "entry.1294608166",
+      consent: "entry.182177265",
+    };
+    const formData = new FormData();
+    formData.append(ENTRY_IDS.name, consultationForm.name);
+    formData.append(ENTRY_IDS.phone, consultationForm.phone);
+    formData.append(ENTRY_IDS.email, consultationForm.email);
+    formData.append(ENTRY_IDS.formName, "Schedule Consultation");
+    if (consultationForm.consent) {
+      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
+    }
+    try {
+      await fetch(GOOGLE_FORM_ACTION_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+    } catch (error) {}
+    setConsultationSubmitted(true);
   };
 
   const closeModal = () => {
     setOpenIndex(null);
     setTimeout(() => setSubmittedIndex(null), 300);
-    setForm({ name: "", phone: "", email: "", consent: false });
-  };
-
-  const handleAllPlansChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setForm({
-      ...form,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
-
-  const handleAllPlansSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (form.consent) {
-      setAllPlansSubmitted(true);
-      setTimeout(() => {
-        allPlansDownloadRef.current?.click();
-      }, 800);
-    }
+    setUnitPlanForm({ name: "", phone: "", email: "", consent: false });
   };
 
   const closeAllPlansModal = () => {
     setAllPlansOpen(false);
     setTimeout(() => setAllPlansSubmitted(false), 300);
-    setForm({ name: "", phone: "", email: "", consent: false });
-  };
-
-  const handleConsultationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setForm({
-      ...form,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
-
-  const handleConsultationSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (form.consent) {
-      setConsultationSubmitted(true);
-    }
+    setAllPlansForm({ name: "", phone: "", email: "", consent: false });
   };
 
   const closeConsultationModal = () => {
     setConsultationOpen(false);
     setTimeout(() => setConsultationSubmitted(false), 300);
-    setForm({ name: "", phone: "", email: "", consent: false });
+    setConsultationForm({ name: "", phone: "", email: "", consent: false });
   };
 
   // Helper to get the floor plan file name based on unit type
@@ -249,7 +312,7 @@ const UnitPlansSection = () => {
                   <button
                     type="button"
                     className="relative h-[50px] w-full max-w-xs flex items-center justify-center gap-2 overflow-hidden border border-[#828281] bg-white text-black shadow-2xl transition-all before:absolute before:left-0 before:right-0 before:top-0 before:h-0 before:w-full before:bg-black before:duration-500 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0 after:w-full after:bg-black after:duration-500 hover:text-white hover:shadow-black hover:before:h-2/4 hover:after:h-2/4 text-base px-8 py-5 font-semibold rounded-lg"
-                    onClick={() => { setOpenIndex(index); setForm({ name: "", phone: "", email: "", consent: false }); setSubmittedIndex(null); }}
+                    onClick={() => { setOpenIndex(index); setUnitPlanForm({ name: "", phone: "", email: "", consent: false }); setSubmittedIndex(null); }}
                   >
                     <span className="relative z-10 whitespace-nowrap">Schedule Visit / Download Unit Plan</span>
                   </button>
@@ -269,15 +332,15 @@ const UnitPlansSection = () => {
                           <form
                             id={`unitplan-download-form-${index}`}
                             className="flex flex-col gap-5"
-                            onSubmit={e => handleSubmit(e, index)}
+                            onSubmit={e => handleUnitPlanSubmit(e, index)}
                           >
                             <h3 className="text-2xl font-bold mb-2 text-center text-primary">Download {unit.type} Floor Plan</h3>
                             <input
                               type="text"
                               name="name"
                               placeholder="Name"
-                              value={form.name}
-                              onChange={handleChange}
+                              value={unitPlanForm.name}
+                              onChange={handleUnitPlanChange}
                               required
                               className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                             />
@@ -285,8 +348,8 @@ const UnitPlansSection = () => {
                               type="tel"
                               name="phone"
                               placeholder="Phone Number"
-                              value={form.phone}
-                              onChange={handleChange}
+                              value={unitPlanForm.phone}
+                              onChange={handleUnitPlanChange}
                               required
                               pattern="[0-9]{10,}"
                               className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
@@ -295,26 +358,27 @@ const UnitPlansSection = () => {
                               type="email"
                               name="email"
                               placeholder="Email ID"
-                              value={form.email}
-                              onChange={handleChange}
+                              value={unitPlanForm.email}
+                              onChange={handleUnitPlanChange}
                               required
                               className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                             />
+                            <input type="hidden" name="formName" value={`Download Floor Plan: ${unit.type}`} />
                             <label className="flex items-center gap-2 text-sm">
                               <input
                                 type="checkbox"
                                 name="consent"
-                                checked={form.consent}
-                                onChange={handleChange}
+                                checked={unitPlanForm.consent}
+                                onChange={handleUnitPlanChange}
                                 required
                                 className="accent-primary"
                               />
-                              I agree to be contacted regarding my enquiry.
+                              I agree to be contacted regarding my enquiry
                             </label>
                             <button
                               type="submit"
                               className="bg-[#CF2E2E] text-white font-bold py-3 rounded-lg hover:bg-[#b82828] transition-colors text-lg mt-2 disabled:opacity-60"
-                              disabled={!form.consent}
+                              disabled={!unitPlanForm.consent}
                             >
                               Download Now
                             </button>
@@ -395,7 +459,7 @@ const UnitPlansSection = () => {
                         type="text"
                         name="name"
                         placeholder="Name"
-                        value={form.name}
+                        value={allPlansForm.name}
                         onChange={handleAllPlansChange}
                         required
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
@@ -404,7 +468,7 @@ const UnitPlansSection = () => {
                         type="tel"
                         name="phone"
                         placeholder="Phone Number"
-                        value={form.phone}
+                        value={allPlansForm.phone}
                         onChange={handleAllPlansChange}
                         required
                         pattern="[0-9]{10,}"
@@ -414,26 +478,27 @@ const UnitPlansSection = () => {
                         type="email"
                         name="email"
                         placeholder="Email ID"
-                        value={form.email}
+                        value={allPlansForm.email}
                         onChange={handleAllPlansChange}
                         required
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                       />
+                      <input type="hidden" name="formName" value="Download All Plans" />
                       <label className="flex items-center gap-2 text-sm">
                         <input
                           type="checkbox"
                           name="consent"
-                          checked={form.consent}
+                          checked={allPlansForm.consent}
                           onChange={handleAllPlansChange}
                           required
                           className="accent-primary"
                         />
-                        I agree to be contacted regarding my enquiry.
+                        I agree to be contacted regarding my enquiry
                       </label>
                       <button
                         type="submit"
                         className="bg-[#CF2E2E] text-white font-bold py-3 rounded-lg hover:bg-[#b82828] transition-colors text-lg mt-2 disabled:opacity-60"
-                        disabled={!form.consent}
+                        disabled={!allPlansForm.consent}
                       >
                         Download All
                       </button>
@@ -484,7 +549,7 @@ const UnitPlansSection = () => {
                         type="text"
                         name="name"
                         placeholder="Name"
-                        value={form.name}
+                        value={consultationForm.name}
                         onChange={handleConsultationChange}
                         required
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
@@ -493,7 +558,7 @@ const UnitPlansSection = () => {
                         type="tel"
                         name="phone"
                         placeholder="Phone Number"
-                        value={form.phone}
+                        value={consultationForm.phone}
                         onChange={handleConsultationChange}
                         required
                         pattern="[0-9]{10,}"
@@ -503,26 +568,27 @@ const UnitPlansSection = () => {
                         type="email"
                         name="email"
                         placeholder="Email ID"
-                        value={form.email}
+                        value={consultationForm.email}
                         onChange={handleConsultationChange}
                         required
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                       />
+                      <input type="hidden" name="formName" value="Schedule Consultation" />
                       <label className="flex items-center gap-2 text-sm">
                         <input
                           type="checkbox"
                           name="consent"
-                          checked={form.consent}
+                          checked={consultationForm.consent}
                           onChange={handleConsultationChange}
                           required
                           className="accent-primary"
                         />
-                        I agree to be contacted regarding my enquiry.
+                        I agree to be contacted regarding my enquiry
                       </label>
                       <button
                         type="submit"
                         className="bg-[#CF2E2E] text-white font-bold py-3 rounded-lg hover:bg-[#b82828] transition-colors text-lg mt-2 disabled:opacity-60"
-                        disabled={!form.consent}
+                        disabled={!consultationForm.consent}
                       >
                         Schedule Consultation
                       </button>
