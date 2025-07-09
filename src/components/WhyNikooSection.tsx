@@ -198,7 +198,7 @@ const WhyNikooSection = () => {
 
           {/* Enquiry Form */}
           <div className="w-full max-w-6xl mx-auto mb-16">
-            <form className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/10 p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6"
+            <form id="nikoo-enquiry-form" className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/10 p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6"
               style={{ boxSizing: 'border-box' }}
               autoComplete="off"
             >
