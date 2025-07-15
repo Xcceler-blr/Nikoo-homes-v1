@@ -9,6 +9,7 @@ const HeroSection = () => {
   const [open, setOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", consent: false });
+  const [formErrors, setFormErrors] = useState<{ email?: string; phone?: string }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -18,8 +19,24 @@ const HeroSection = () => {
     });
   };
 
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  const validatePhone = (phone: string) => {
+    return /^\d{10}$/.test(phone) && !/^([0-9])\1{9}$/.test(phone);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let errors: { email?: string; phone?: string } = {};
+    if (!validateEmail(form.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!validatePhone(form.phone)) {
+      errors.phone = "Please enter a valid 10-digit phone number.";
+    }
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     // Google Form integration
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
     const ENTRY_IDS = {
@@ -59,6 +76,7 @@ const HeroSection = () => {
   const [brochureOpen, setBrochureOpen] = useState(false);
   const [brochureSubmitted, setBrochureSubmitted] = useState(false);
   const [brochureForm, setBrochureForm] = useState({ name: "", phone: "", email: "", consent: false });
+  const [brochureFormErrors, setBrochureFormErrors] = useState<{ email?: string; phone?: string }>({});
 
   const handleBrochureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -70,6 +88,15 @@ const HeroSection = () => {
 
   const handleBrochureSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let errors: { email?: string; phone?: string } = {};
+    if (!validateEmail(brochureForm.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!validatePhone(brochureForm.phone)) {
+      errors.phone = "Please enter a valid 10-digit phone number.";
+    }
+    setBrochureFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
     const ENTRY_IDS = {
       name: "entry.1338687725",
@@ -222,6 +249,7 @@ const HeroSection = () => {
                     pattern="[0-9]{10,}"
                     className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
+                  {formErrors.phone && <span className="text-red-600 text-sm">{formErrors.phone}</span>}
                   <input
                     type="email"
                     name="email"
@@ -231,6 +259,7 @@ const HeroSection = () => {
                     required
                     className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
+                  {formErrors.email && <span className="text-red-600 text-sm">{formErrors.email}</span>}
                   <input type="hidden" name="formName" value="Schedule Visit" />
                   <label className="flex items-center gap-2 text-sm">
                     <input
@@ -306,6 +335,7 @@ const HeroSection = () => {
                     pattern="[0-9]{10,}"
                     className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
+                  {brochureFormErrors.phone && <span className="text-red-600 text-sm">{brochureFormErrors.phone}</span>}
                   <input
                     type="email"
                     name="email"
@@ -315,6 +345,7 @@ const HeroSection = () => {
                     required
                     className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
+                  {brochureFormErrors.email && <span className="text-red-600 text-sm">{brochureFormErrors.email}</span>}
                   <input type="hidden" name="formName" value="Download Brochure" />
                   <label className="flex items-center gap-2 text-sm">
                     <input

@@ -90,6 +90,9 @@ const UnitPlansSection = () => {
   const [unitPlanForm, setUnitPlanForm] = useState({ name: "", phone: "", email: "", consent: false });
   const [allPlansForm, setAllPlansForm] = useState({ name: "", phone: "", email: "", consent: false });
   const [consultationForm, setConsultationForm] = useState({ name: "", phone: "", email: "", consent: false });
+  const [unitPlanFormErrors, setUnitPlanFormErrors] = useState<{ email?: string; phone?: string }>({});
+  const [allPlansFormErrors, setAllPlansFormErrors] = useState<{ email?: string; phone?: string }>({});
+  const [consultationFormErrors, setConsultationFormErrors] = useState<{ email?: string; phone?: string }>({});
   const downloadRef = useRef<HTMLAnchorElement>(null);
   const [allPlansOpen, setAllPlansOpen] = useState(false);
   const [allPlansSubmitted, setAllPlansSubmitted] = useState(false);
@@ -123,6 +126,15 @@ const UnitPlansSection = () => {
   // Update handleSubmit for each form
   const handleUnitPlanSubmit = async (e: React.FormEvent, idx: number) => {
     e.preventDefault();
+    let errors: { email?: string; phone?: string } = {};
+    if (!validateEmail(unitPlanForm.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!validatePhone(unitPlanForm.phone)) {
+      errors.phone = "Please enter a valid 10-digit phone number.";
+    }
+    setUnitPlanFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
     const ENTRY_IDS = {
       name: "entry.1338687725",
@@ -153,6 +165,15 @@ const UnitPlansSection = () => {
   };
   const handleAllPlansSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let errors: { email?: string; phone?: string } = {};
+    if (!validateEmail(allPlansForm.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!validatePhone(allPlansForm.phone)) {
+      errors.phone = "Please enter a valid 10-digit phone number.";
+    }
+    setAllPlansFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
     const ENTRY_IDS = {
       name: "entry.1338687725",
@@ -183,6 +204,15 @@ const UnitPlansSection = () => {
   };
   const handleConsultationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let errors: { email?: string; phone?: string } = {};
+    if (!validateEmail(consultationForm.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!validatePhone(consultationForm.phone)) {
+      errors.phone = "Please enter a valid 10-digit phone number.";
+    }
+    setConsultationFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
     const ENTRY_IDS = {
       name: "entry.1338687725",
@@ -242,6 +272,13 @@ const UnitPlansSection = () => {
       "4 BHK": "4bhk.png"
     };
     return fileMap[type] || "floorplan.png";
+  };
+
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  const validatePhone = (phone: string) => {
+    return /^\d{10}$/.test(phone) && !/^([0-9])\1{9}$/.test(phone);
   };
 
   return (
@@ -354,6 +391,7 @@ const UnitPlansSection = () => {
                               pattern="[0-9]{10,}"
                               className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                             />
+                            {unitPlanFormErrors.phone && <span className="text-red-600 text-sm">{unitPlanFormErrors.phone}</span>}
                             <input
                               type="email"
                               name="email"
@@ -363,6 +401,7 @@ const UnitPlansSection = () => {
                               required
                               className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                             />
+                            {unitPlanFormErrors.email && <span className="text-red-600 text-sm">{unitPlanFormErrors.email}</span>}
                             <input type="hidden" name="formName" value={`Download Floor Plan: ${unit.type}`} />
                             <label className="flex items-center gap-2 text-sm">
                               <input
@@ -474,6 +513,7 @@ const UnitPlansSection = () => {
                         pattern="[0-9]{10,}"
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                       />
+                      {allPlansFormErrors.phone && <span className="text-red-600 text-sm">{allPlansFormErrors.phone}</span>}
                       <input
                         type="email"
                         name="email"
@@ -483,6 +523,7 @@ const UnitPlansSection = () => {
                         required
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                       />
+                      {allPlansFormErrors.email && <span className="text-red-600 text-sm">{allPlansFormErrors.email}</span>}
                       <input type="hidden" name="formName" value="Download All Plans" />
                       <label className="flex items-center gap-2 text-sm">
                         <input
@@ -564,6 +605,7 @@ const UnitPlansSection = () => {
                         pattern="[0-9]{10,}"
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                       />
+                      {consultationFormErrors.phone && <span className="text-red-600 text-sm">{consultationFormErrors.phone}</span>}
                       <input
                         type="email"
                         name="email"
@@ -573,6 +615,7 @@ const UnitPlansSection = () => {
                         required
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                       />
+                      {consultationFormErrors.email && <span className="text-red-600 text-sm">{consultationFormErrors.email}</span>}
                       <input type="hidden" name="formName" value="Schedule Consultation" />
                       <label className="flex items-center gap-2 text-sm">
                         <input

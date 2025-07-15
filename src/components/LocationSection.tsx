@@ -66,6 +66,8 @@ const LocationSection = () => {
   const [mapsOpen, setMapsOpen] = useState(false);
   const [mapsSubmitted, setMapsSubmitted] = useState(false);
   const [mapsForm, setMapsForm] = useState({ name: "", phone: "", email: "", consent: false });
+  const [siteVisitFormErrors, setSiteVisitFormErrors] = useState<{ email?: string; phone?: string }>({});
+  const [mapsFormErrors, setMapsFormErrors] = useState<{ email?: string; phone?: string }>({});
 
   const handleSiteVisitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -75,8 +77,24 @@ const LocationSection = () => {
     });
   };
 
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+  const validatePhone = (phone: string) => {
+    return /^\d{10}$/.test(phone) && !/^([0-9])\1{9}$/.test(phone);
+  };
+
   const handleSiteVisitSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let errors: { email?: string; phone?: string } = {};
+    if (!validateEmail(siteVisitForm.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!validatePhone(siteVisitForm.phone)) {
+      errors.phone = "Please enter a valid 10-digit phone number.";
+    }
+    setSiteVisitFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
     const ENTRY_IDS = {
       name: "entry.1338687725",
@@ -107,6 +125,7 @@ const LocationSection = () => {
     setSiteVisitOpen(false);
     setTimeout(() => setSiteVisitSubmitted(false), 300);
     setSiteVisitForm({ name: "", phone: "", email: "", consent: false });
+    setSiteVisitFormErrors({});
   };
 
   const handleMapsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +138,15 @@ const LocationSection = () => {
 
   const handleMapsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let errors: { email?: string; phone?: string } = {};
+    if (!validateEmail(mapsForm.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!validatePhone(mapsForm.phone)) {
+      errors.phone = "Please enter a valid 10-digit phone number.";
+    }
+    setMapsFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
     const ENTRY_IDS = {
       name: "entry.1338687725",
@@ -149,6 +177,7 @@ const LocationSection = () => {
     setMapsOpen(false);
     setTimeout(() => setMapsSubmitted(false), 300);
     setMapsForm({ name: "", phone: "", email: "", consent: false });
+    setMapsFormErrors({});
   };
 
   return (
@@ -394,6 +423,7 @@ const LocationSection = () => {
                           pattern="[0-9]{10,}"
                           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                         />
+                        {siteVisitFormErrors.phone && <span className="text-red-600 text-sm">{siteVisitFormErrors.phone}</span>}
                         <input
                           type="email"
                           name="email"
@@ -403,6 +433,7 @@ const LocationSection = () => {
                           required
                           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                         />
+                        {siteVisitFormErrors.email && <span className="text-red-600 text-sm">{siteVisitFormErrors.email}</span>}
                         <label className="flex items-center gap-2 text-sm">
                           <input
                             type="checkbox"
@@ -483,6 +514,7 @@ const LocationSection = () => {
                           pattern="[0-9]{10,}"
                           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                         />
+                        {mapsFormErrors.phone && <span className="text-red-600 text-sm">{mapsFormErrors.phone}</span>}
                         <input
                           type="email"
                           name="email"
@@ -492,6 +524,7 @@ const LocationSection = () => {
                           required
                           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                         />
+                        {mapsFormErrors.email && <span className="text-red-600 text-sm">{mapsFormErrors.email}</span>}
                         <label className="flex items-center gap-2 text-sm">
                           <input
                             type="checkbox"
