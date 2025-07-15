@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin, Phone } from "lucide-react";
 import heroImage from "@/assets/nikoo-hero.png";
@@ -77,6 +77,7 @@ const HeroSection = () => {
   const [brochureSubmitted, setBrochureSubmitted] = useState(false);
   const [brochureForm, setBrochureForm] = useState({ name: "", phone: "", email: "", consent: false });
   const [brochureFormErrors, setBrochureFormErrors] = useState<{ email?: string; phone?: string }>({});
+  const brochureDownloadRef = useRef<HTMLAnchorElement>(null);
 
   const handleBrochureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -128,6 +129,12 @@ const HeroSection = () => {
     setTimeout(() => setBrochureSubmitted(false), 300);
     setBrochureForm({ name: "", phone: "", email: "", consent: false });
   };
+
+  useEffect(() => {
+    if (brochureSubmitted && brochureDownloadRef.current) {
+      brochureDownloadRef.current.click();
+    }
+  }, [brochureSubmitted]);
 
   return (
     <>
@@ -370,6 +377,15 @@ const HeroSection = () => {
                 <div className="flex flex-col items-center justify-center min-h-[200px]">
                   <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
                   <p className="text-gray-700 text-center mb-4">Your details have been received.<br/>Click below to download the brochure.</p>
+                  <a
+                    href="/brochure.pdf"
+                    download
+                    className="bg-[#CF2E2E] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#b82828] transition-colors text-lg"
+                    ref={brochureDownloadRef}
+                    style={{ display: "none" }}
+                  >
+                    Download Brochure
+                  </a>
                   <a
                     href="/brochure.pdf"
                     download
