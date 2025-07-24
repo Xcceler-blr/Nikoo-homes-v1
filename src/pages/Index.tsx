@@ -11,6 +11,20 @@ const Index = () => {
   const [showGoToTop, setShowGoToTop] = useState(false);
 
   useEffect(() => {
+    document.title = "Live Smart at Bhartiya City Nikoo Homes Sadahalli | 2 & 3 BHK";
+    const metaDescription = document.querySelector('meta[name="description"]');
+    const descriptionContent = "Explore Bhartiya City Nikoo Homes Sadahalli for premium 2 & 3 BHK apartments with top-class amenities in North Bangalore. Book your dream home today!";
+    if (metaDescription) {
+      metaDescription.setAttribute('content', descriptionContent);
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = "description";
+      meta.content = descriptionContent;
+      document.head.appendChild(meta);
+    }
+  }, []);
+
+  useEffect(() => {
     const reveal = () => {
       sections.forEach((ref) => {
         if (!ref.current) return;
