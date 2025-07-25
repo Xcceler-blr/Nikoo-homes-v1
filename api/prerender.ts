@@ -1,6 +1,9 @@
 // Vercel Serverless Function: Prerender handler for bots
 // Uses ES Module syntax and standard Request/Response objects for compatibility
 
+import fetchOrig from 'node-fetch';
+const fetch = globalThis.fetch || fetchOrig;
+
 const BOT_UA_REGEX = /Googlebot|Bingbot|Yahoo|facebookexternalhit|Twitterbot|LinkedInBot|Slackbot/i;
 
 export default async function handler(req, res) {
