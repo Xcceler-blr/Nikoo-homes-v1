@@ -5,6 +5,7 @@ import { Clock, MapPin, Plane, Train, Car, Building2 } from "lucide-react";
 import locationMapImage from "@/assets/location-nikoo.png";
 import { useState, useRef } from "react";
 import { ModalPortal } from "./ModalPortal";
+import { HubSpotIntegration } from "@/lib/hubspot-integration";
 
 const LocationSection = () => {
   const landmarks = [
@@ -95,29 +96,24 @@ const LocationSection = () => {
     }
     setSiteVisitFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
-    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
-    const ENTRY_IDS = {
-      name: "entry.1338687725",
-      phone: "entry.1492404407",
-      email: "entry.1765571584",
-      formName: "entry.1294608166",
-      consent: "entry.182177265",
-    };
-    const formData = new FormData();
-    formData.append(ENTRY_IDS.name, siteVisitForm.name);
-    formData.append(ENTRY_IDS.phone, siteVisitForm.phone);
-    formData.append(ENTRY_IDS.email, siteVisitForm.email);
-    formData.append(ENTRY_IDS.formName, "Schedule Site Visit");
-    if (siteVisitForm.consent) {
-      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
-    }
+    
     try {
-      await fetch(GOOGLE_FORM_ACTION_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData,
+      // Submit to both Google Forms and HubSpot
+      await HubSpotIntegration.submitToBoth('site-visit', {
+        name: siteVisitForm.name,
+        email: siteVisitForm.email,
+        phone: siteVisitForm.phone,
+        consent: siteVisitForm.consent,
+        formName: "Schedule Site Visit",
+        additionalData: {
+          source: 'Location Section',
+          visit_type: 'site_visit',
+          page_url: window.location.href
+        }
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
     setSiteVisitSubmitted(true);
   };
 
@@ -147,29 +143,24 @@ const LocationSection = () => {
     }
     setMapsFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
-    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
-    const ENTRY_IDS = {
-      name: "entry.1338687725",
-      phone: "entry.1492404407",
-      email: "entry.1765571584",
-      formName: "entry.1294608166",
-      consent: "entry.182177265",
-    };
-    const formData = new FormData();
-    formData.append(ENTRY_IDS.name, mapsForm.name);
-    formData.append(ENTRY_IDS.phone, mapsForm.phone);
-    formData.append(ENTRY_IDS.email, mapsForm.email);
-    formData.append(ENTRY_IDS.formName, "Get Location on WhatsApp");
-    if (mapsForm.consent) {
-      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
-    }
+    
     try {
-      await fetch(GOOGLE_FORM_ACTION_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData,
+      // Submit to both Google Forms and HubSpot
+      await HubSpotIntegration.submitToBoth('lead-capture', {
+        name: mapsForm.name,
+        email: mapsForm.email,
+        phone: mapsForm.phone,
+        consent: mapsForm.consent,
+        formName: "Get Location on WhatsApp",
+        additionalData: {
+          source: 'Location Section',
+          request_type: 'whatsapp_location',
+          page_url: window.location.href
+        }
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
     setMapsSubmitted(true);
   };
 

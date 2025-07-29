@@ -4,6 +4,7 @@ import { ArrowRight, MapPin, Phone } from "lucide-react";
 import heroImage from "@/assets/nikoo-hero.png";
 import logo from "@/assets/nikoo homes.png";
 import { ModalPortal } from "./ModalPortal";
+import { HubSpotIntegration } from "@/lib/hubspot-integration";
 
 const HeroSection = () => {
   const [open, setOpen] = useState(false);
@@ -37,32 +38,22 @@ const HeroSection = () => {
     }
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
-    // Google Form integration
-    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
-    const ENTRY_IDS = {
-      name: "entry.1338687725",
-      phone: "entry.1492404407",
-      email: "entry.1765571584",
-      formName: "entry.1294608166",
-      consent: "entry.182177265",
-    };
-    const formData = new FormData();
-    formData.append(ENTRY_IDS.name, form.name);
-    formData.append(ENTRY_IDS.phone, form.phone);
-    formData.append(ENTRY_IDS.email, form.email);
-    // Add form name as a hidden field
-    formData.append(ENTRY_IDS.formName, "Schedule Visit");
-    // Only append consent if checked, and use the label as value
-    if (form.consent) {
-      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
-    }
+    
     try {
-      await fetch(GOOGLE_FORM_ACTION_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData,
+      // Submit to both Google Forms and HubSpot
+      await HubSpotIntegration.submitToBoth('site-visit', {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        consent: form.consent,
+        formName: "Schedule Visit",
+        additionalData: {
+          source: 'Hero Section',
+          page_url: window.location.href
+        }
       });
     } catch (error) {
+      console.error('Form submission error:', error);
       // Optionally handle error
     }
     setSubmitted(true);
@@ -98,29 +89,23 @@ const HeroSection = () => {
     }
     setBrochureFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
-    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
-    const ENTRY_IDS = {
-      name: "entry.1338687725",
-      phone: "entry.1492404407",
-      email: "entry.1765571584",
-      formName: "entry.1294608166",
-      consent: "entry.182177265",
-    };
-    const formData = new FormData();
-    formData.append(ENTRY_IDS.name, brochureForm.name);
-    formData.append(ENTRY_IDS.phone, brochureForm.phone);
-    formData.append(ENTRY_IDS.email, brochureForm.email);
-    formData.append(ENTRY_IDS.formName, "Download Brochure");
-    if (brochureForm.consent) {
-      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
-    }
+    
     try {
-      await fetch(GOOGLE_FORM_ACTION_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData,
+      // Submit to both Google Forms and HubSpot
+      await HubSpotIntegration.submitToBoth('download', {
+        name: brochureForm.name,
+        email: brochureForm.email,
+        phone: brochureForm.phone,
+        consent: brochureForm.consent,
+        formName: "Download Brochure",
+        additionalData: {
+          source: 'Hero Section',
+          page_url: window.location.href
+        }
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
     setBrochureSubmitted(true);
   };
 

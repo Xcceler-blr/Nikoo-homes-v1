@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Download, Home, Square } from "lucide-react";
 import { useState, useRef } from "react";
 import { ModalPortal } from "./ModalPortal";
+import { HubSpotIntegration } from "@/lib/hubspot-integration";
 
 // Import local images
 import studioImage from "@/assets/studio .png";
@@ -135,29 +136,25 @@ const UnitPlansSection = () => {
     }
     setUnitPlanFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
-    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
-    const ENTRY_IDS = {
-      name: "entry.1338687725",
-      phone: "entry.1492404407",
-      email: "entry.1765571584",
-      formName: "entry.1294608166",
-      consent: "entry.182177265",
-    };
-    const formData = new FormData();
-    formData.append(ENTRY_IDS.name, unitPlanForm.name);
-    formData.append(ENTRY_IDS.phone, unitPlanForm.phone);
-    formData.append(ENTRY_IDS.email, unitPlanForm.email);
-    formData.append(ENTRY_IDS.formName, `Download Floor Plan: ${unitPlans[idx].type}`);
-    if (unitPlanForm.consent) {
-      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
-    }
+    
     try {
-      await fetch(GOOGLE_FORM_ACTION_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData,
+      // Submit to both Google Forms and HubSpot
+      await HubSpotIntegration.submitToBoth('download', {
+        name: unitPlanForm.name,
+        email: unitPlanForm.email,
+        phone: unitPlanForm.phone,
+        consent: unitPlanForm.consent,
+        formName: `Download Floor Plan: ${unitPlans[idx].type}`,
+        additionalData: {
+          source: 'Unit Plans Section',
+          unit_type: unitPlans[idx].type,
+          unit_price: unitPlans[idx].price,
+          page_url: window.location.href
+        }
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
     setSubmittedIndex(idx);
     setTimeout(() => {
       downloadRef.current?.click();
@@ -174,29 +171,24 @@ const UnitPlansSection = () => {
     }
     setAllPlansFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
-    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
-    const ENTRY_IDS = {
-      name: "entry.1338687725",
-      phone: "entry.1492404407",
-      email: "entry.1765571584",
-      formName: "entry.1294608166",
-      consent: "entry.182177265",
-    };
-    const formData = new FormData();
-    formData.append(ENTRY_IDS.name, allPlansForm.name);
-    formData.append(ENTRY_IDS.phone, allPlansForm.phone);
-    formData.append(ENTRY_IDS.email, allPlansForm.email);
-    formData.append(ENTRY_IDS.formName, "Download All Plans");
-    if (allPlansForm.consent) {
-      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
-    }
+    
     try {
-      await fetch(GOOGLE_FORM_ACTION_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData,
+      // Submit to both Google Forms and HubSpot
+      await HubSpotIntegration.submitToBoth('download', {
+        name: allPlansForm.name,
+        email: allPlansForm.email,
+        phone: allPlansForm.phone,
+        consent: allPlansForm.consent,
+        formName: "Download All Plans",
+        additionalData: {
+          source: 'Unit Plans Section',
+          download_type: 'all_plans',
+          page_url: window.location.href
+        }
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
     setAllPlansSubmitted(true);
     setTimeout(() => {
       allPlansDownloadRef.current?.click();
@@ -213,29 +205,24 @@ const UnitPlansSection = () => {
     }
     setConsultationFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
-    const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeDGka2PeJFaPp7z0NrndXt8rvuJwNxzi6ffllVgO8SyQfWtg/formResponse";
-    const ENTRY_IDS = {
-      name: "entry.1338687725",
-      phone: "entry.1492404407",
-      email: "entry.1765571584",
-      formName: "entry.1294608166",
-      consent: "entry.182177265",
-    };
-    const formData = new FormData();
-    formData.append(ENTRY_IDS.name, consultationForm.name);
-    formData.append(ENTRY_IDS.phone, consultationForm.phone);
-    formData.append(ENTRY_IDS.email, consultationForm.email);
-    formData.append(ENTRY_IDS.formName, "Schedule Consultation");
-    if (consultationForm.consent) {
-      formData.append(ENTRY_IDS.consent, "I agree to be contacted regarding my enquiry");
-    }
+    
     try {
-      await fetch(GOOGLE_FORM_ACTION_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData,
+      // Submit to both Google Forms and HubSpot
+      await HubSpotIntegration.submitToBoth('site-visit', {
+        name: consultationForm.name,
+        email: consultationForm.email,
+        phone: consultationForm.phone,
+        consent: consultationForm.consent,
+        formName: "Schedule Consultation",
+        additionalData: {
+          source: 'Unit Plans Section',
+          consultation_type: 'unit_selection',
+          page_url: window.location.href
+        }
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
     setConsultationSubmitted(true);
   };
 
