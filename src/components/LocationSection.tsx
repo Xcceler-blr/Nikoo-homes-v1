@@ -4,10 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Clock, MapPin, Plane, Train, Car, Building2 } from "lucide-react";
 import locationMapImage from "@/assets/location-nikoo.png";
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { ModalPortal } from "./ModalPortal";
 import { HubSpotIntegration } from "@/lib/hubspot-integration";
 
 const LocationSection = () => {
+  const navigate = useNavigate();
   const landmarks = [
     {
       icon: Train,
@@ -114,12 +116,12 @@ const LocationSection = () => {
     } catch (error) {
       console.error('Form submission error:', error);
     }
-    setSiteVisitSubmitted(true);
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
 
   const closeSiteVisitModal = () => {
     setSiteVisitOpen(false);
-    setTimeout(() => setSiteVisitSubmitted(false), 300);
     setSiteVisitForm({ name: "", phone: "", email: "", consent: false });
     setSiteVisitFormErrors({});
   };
@@ -161,12 +163,12 @@ const LocationSection = () => {
     } catch (error) {
       console.error('Form submission error:', error);
     }
-    setMapsSubmitted(true);
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
 
   const closeMapsModal = () => {
     setMapsOpen(false);
-    setTimeout(() => setMapsSubmitted(false), 300);
     setMapsForm({ name: "", phone: "", email: "", consent: false });
     setMapsFormErrors({});
   };

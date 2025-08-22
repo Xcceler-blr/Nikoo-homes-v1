@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin, Phone } from "lucide-react";
 import heroImage from "@/assets/nikoo-hero.png";
@@ -7,8 +8,8 @@ import { ModalPortal } from "./ModalPortal";
 import { HubSpotIntegration } from "@/lib/hubspot-integration";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", consent: false });
   const [formErrors, setFormErrors] = useState<{ email?: string; phone?: string }>({});
 
@@ -56,16 +57,15 @@ const HeroSection = () => {
       console.error('Form submission error:', error);
       // Optionally handle error
     }
-    setSubmitted(true);
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
 
   const closeModal = () => {
     setOpen(false);
-    setTimeout(() => setSubmitted(false), 300); // Reset after closing
   };
 
   const [brochureOpen, setBrochureOpen] = useState(false);
-  const [brochureSubmitted, setBrochureSubmitted] = useState(false);
   const [brochureForm, setBrochureForm] = useState({ name: "", phone: "", email: "", consent: false });
   const [brochureFormErrors, setBrochureFormErrors] = useState<{ email?: string; phone?: string }>({});
   const brochureDownloadRef = useRef<HTMLAnchorElement>(null);
@@ -106,20 +106,20 @@ const HeroSection = () => {
     } catch (error) {
       console.error('Form submission error:', error);
     }
-    setBrochureSubmitted(true);
+    // Trigger brochure download before redirecting
+    if (brochureDownloadRef.current) {
+      brochureDownloadRef.current.click();
+    }
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
 
   const closeBrochureModal = () => {
     setBrochureOpen(false);
-    setTimeout(() => setBrochureSubmitted(false), 300);
     setBrochureForm({ name: "", phone: "", email: "", consent: false });
   };
 
-  useEffect(() => {
-    if (brochureSubmitted && brochureDownloadRef.current) {
-      brochureDownloadRef.current.click();
-    }
-  }, [brochureSubmitted]);
+
 
   return (
     <>
@@ -215,7 +215,6 @@ const HeroSection = () => {
               >
                 ×
               </button>
-              {!submitted ? (
                 <form
                   id="nikoo-visit-scheduler-form"
                   className="flex flex-col gap-5"
@@ -272,18 +271,6 @@ const HeroSection = () => {
                     Schedule Visit Now
                   </button>
                 </form>
-              ) : (
-                <div className="flex flex-col items-center justify-center min-h-[200px]">
-                  <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
-                  <p className="text-gray-700 text-center">Your visit has been scheduled.<br/>We will contact you soon.</p>
-                  <button
-                    className="mt-6 bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#b82828]"
-                    onClick={closeModal}
-                  >
-                    Close
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </ModalPortal>
@@ -301,7 +288,6 @@ const HeroSection = () => {
               >
                 ×
               </button>
-              {!brochureSubmitted ? (
                 <form
                   id="nikoo-brochure-download-form"
                   className="flex flex-col gap-5"
@@ -358,34 +344,15 @@ const HeroSection = () => {
                     Download Brochure
                   </button>
                 </form>
-              ) : (
-                <div className="flex flex-col items-center justify-center min-h-[200px]">
-                  <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
-                  <p className="text-gray-700 text-center mb-4">Your details have been received.<br/>Click below to download the brochure.</p>
-                  <a
-                    href="/brochure.pdf"
-                    download
-                    className="bg-[#CF2E2E] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#b82828] transition-colors text-lg"
-                    ref={brochureDownloadRef}
-                    style={{ display: "none" }}
-                  >
-                    Download Brochure
-                  </a>
-                  <a
-                    href="/brochure.pdf"
-                    download
-                    className="bg-[#CF2E2E] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#b82828] transition-colors text-lg"
-                  >
-                    Download Brochure
-                  </a>
-                  <button
-                    className="mt-6 bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#b82828]"
-                    onClick={closeBrochureModal}
-                  >
-                    Close
-                  </button>
-                </div>
-              )}
+                {/* Hidden download link for automatic download */}
+                <a
+                  ref={brochureDownloadRef}
+                  href="/brochure.pdf"
+                  download
+                  className="hidden"
+                >
+                  Download Brochure
+                </a>
             </div>
           </div>
         </ModalPortal>

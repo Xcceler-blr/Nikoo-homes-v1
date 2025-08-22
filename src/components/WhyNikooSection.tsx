@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,13 +9,12 @@ import { ModalPortal } from "./ModalPortal";
 import { HubSpotIntegration } from "@/lib/hubspot-integration";
 
 const WhyNikooSection = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", consent: false });
 
   // State for inline enquiry form
   const [enquiryForm, setEnquiryForm] = useState({ name: "", phone: "", email: "", consent: false });
-  const [enquirySubmitted, setEnquirySubmitted] = useState(false);
 
   const [formErrors, setFormErrors] = useState<{ email?: string; phone?: string }>({});
   const [enquiryFormErrors, setEnquiryFormErrors] = useState<{ email?: string; phone?: string }>({});
@@ -73,7 +73,8 @@ const WhyNikooSection = () => {
     } catch (error) {
       console.error('Form submission error:', error);
     }
-    setSubmitted(true);
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
 
   const handleEnquiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,12 +113,12 @@ const WhyNikooSection = () => {
     } catch (error) {
       console.error('Form submission error:', error);
     }
-    setEnquirySubmitted(true);
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
 
   const closeModal = () => {
     setOpen(false);
-    setTimeout(() => setSubmitted(false), 300);
     setForm({ name: "", phone: "", email: "", consent: false });
   };
 
@@ -176,7 +177,7 @@ const WhyNikooSection = () => {
               >
                 ×
               </button>
-              {!submitted ? (
+
                 <form
                   id="nikoo-discover-more-form"
                   className="flex flex-col gap-5"
@@ -233,18 +234,6 @@ const WhyNikooSection = () => {
                     Submit
                   </button>
                 </form>
-              ) : (
-                <div className="flex flex-col items-center justify-center min-h-[200px]">
-                  <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
-                  <p className="text-gray-700 text-center">We will send you more information about Nikoo Garden Estates soon.</p>
-                  <button
-                    className="mt-6 bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#b82828]"
-                    onClick={closeModal}
-                  >
-                    Close
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </ModalPortal>
@@ -278,65 +267,58 @@ const WhyNikooSection = () => {
 
           {/* Enquiry Form */}
           <div className="w-full max-w-6xl mx-auto mb-16">
-            {!enquirySubmitted ? (
-              <form id="nikoo-enquiry-form" className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/10 p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6" style={{ boxSizing: 'border-box' }} autoComplete="off" onSubmit={handleEnquirySubmit}>
+            <form id="nikoo-enquiry-form" className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/10 p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6" style={{ boxSizing: 'border-box' }} autoComplete="off" onSubmit={handleEnquirySubmit}>
+              <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={enquiryForm.name}
+                onChange={handleEnquiryChange}
+                required
+                className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
+              />
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                value={enquiryForm.phone}
+                onChange={handleEnquiryChange}
+                required
+                pattern="[0-9]{10,}"
+                className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
+              />
+              {enquiryFormErrors.phone && <span className="text-red-600 text-sm">{enquiryFormErrors.phone}</span>}
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={enquiryForm.email}
+                onChange={handleEnquiryChange}
+                required
+                className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
+              />
+              {enquiryFormErrors.email && <span className="text-red-600 text-sm">{enquiryFormErrors.email}</span>}
+              <input type="hidden" name="formName" value="Enquiry Form" />
+              <label className="flex items-center gap-2 text-sm">
                 <input
-                  type="text"
-                  name="name"
-                  placeholder="Name"
-                  value={enquiryForm.name}
+                  type="checkbox"
+                  name="consent"
+                  checked={enquiryForm.consent}
                   onChange={handleEnquiryChange}
                   required
-                  className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
+                  className="accent-primary"
                 />
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="Phone Number"
-                  value={enquiryForm.phone}
-                  onChange={handleEnquiryChange}
-                  required
-                  pattern="[0-9]{10,}"
-                  className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
-                />
-                {enquiryFormErrors.phone && <span className="text-red-600 text-sm">{enquiryFormErrors.phone}</span>}
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={enquiryForm.email}
-                  onChange={handleEnquiryChange}
-                  required
-                  className="flex-1 min-w-0 w-full md:w-auto rounded-lg border border-input bg-background px-4 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 placeholder:text-muted-foreground transition-all"
-                />
-                {enquiryFormErrors.email && <span className="text-red-600 text-sm">{enquiryFormErrors.email}</span>}
-                <input type="hidden" name="formName" value="Enquiry Form" />
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    name="consent"
-                    checked={enquiryForm.consent}
-                    onChange={handleEnquiryChange}
-                    required
-                    className="accent-primary"
-                  />
-                  I agree to be contacted regarding my enquiry
-                </label>
-                <Button
-                  size="lg"
-                  className="px-8 py-2 text-lg font-bold shadow-lg bg-[#CF2E2E] text-white hover:bg-[#b82828] border-none flex items-center justify-center whitespace-nowrap"
-                  type="submit"
-                  disabled={!enquiryForm.consent}
-                >
-                  Submit Enquiry
-                </Button>
-              </form>
-            ) : (
-              <div className="w-full bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/10 p-8 flex flex-col items-center justify-center min-h-[200px]">
-                <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
-                <p className="text-gray-700 text-center">We have received your enquiry and will contact you soon.</p>
-              </div>
-            )}
+                I agree to be contacted regarding my enquiry
+              </label>
+              <Button
+                size="lg"
+                className="px-8 py-2 text-lg font-bold shadow-lg bg-[#CF2E2E] text-white hover:bg-[#b82828] border-none flex items-center justify-center whitespace-nowrap"
+                type="submit"
+                disabled={!enquiryForm.consent}
+              >
+                Submit Enquiry
+              </Button>
+            </form>
           </div>
 
           {/* Highlights Grid */}

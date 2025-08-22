@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import masterPlanImage from "@/assets/Masterplan-01.png";
 import meditationGardenImg from "@/assets/yoga-garden.png";
 import reflexologyPathImg from "@/assets/Reflexology-Path.png";
@@ -149,10 +150,10 @@ const amenities = [
 ];
 
 const AmenitiesSection = () => {
+  const navigate = useNavigate();
   const [selectedAmenity, setSelectedAmenity] = useState(null);
   const [hoveredAmenity, setHoveredAmenity] = useState(null);
   const [open, setOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", consent: false });
   const [formErrors, setFormErrors] = useState<{ email?: string; phone?: string }>({});
 
@@ -201,12 +202,12 @@ const AmenitiesSection = () => {
     } catch (error) {
       console.error('Form submission error:', error);
     }
-    setSubmitted(true);
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
 
   const closeModal = () => {
     setOpen(false);
-    setTimeout(() => setSubmitted(false), 300);
     setForm({ name: "", phone: "", email: "", consent: false });
   };
 
@@ -278,7 +279,6 @@ const AmenitiesSection = () => {
                     >
                       ×
                     </button>
-                    {!submitted ? (
                       <form
                         id="amenities-visit-scheduler-form"
                         className="flex flex-col gap-5"
@@ -335,18 +335,6 @@ const AmenitiesSection = () => {
                           Schedule Visit Now
                         </button>
                       </form>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center min-h-[200px]">
-                        <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
-                        <p className="text-gray-700 text-center">Your request for a visit has been received.<br/>Our team will reach out to you soon to confirm your visit to the amenities!</p>
-                        <button
-                          className="mt-6 bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#b82828]"
-                          onClick={closeModal}
-                        >
-                          Close
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
               </ModalPortal>

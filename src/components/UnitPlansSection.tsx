@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Download, Home, Square } from "lucide-react";
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { ModalPortal } from "./ModalPortal";
 import { HubSpotIntegration } from "@/lib/hubspot-integration";
 
@@ -19,6 +20,7 @@ import threeBedLoftImage from "@/assets/3 Bed Loft.png";
 import fourBhkImage from "@/assets/4bhk.png";
 
 const UnitPlansSection = () => {
+    const navigate = useNavigate();
     const unitPlans = [
     {
       type: "Studio",
@@ -86,7 +88,6 @@ const UnitPlansSection = () => {
   ];
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [submittedIndex, setSubmittedIndex] = useState<number | null>(null);
   // Replace single form state with separate states for each form
   const [unitPlanForm, setUnitPlanForm] = useState({ name: "", phone: "", email: "", consent: false });
   const [allPlansForm, setAllPlansForm] = useState({ name: "", phone: "", email: "", consent: false });
@@ -96,10 +97,8 @@ const UnitPlansSection = () => {
   const [consultationFormErrors, setConsultationFormErrors] = useState<{ email?: string; phone?: string }>({});
   const downloadRef = useRef<HTMLAnchorElement>(null);
   const [allPlansOpen, setAllPlansOpen] = useState(false);
-  const [allPlansSubmitted, setAllPlansSubmitted] = useState(false);
   const allPlansDownloadRef = useRef<HTMLAnchorElement>(null);
   const [consultationOpen, setConsultationOpen] = useState(false);
-  const [consultationSubmitted, setConsultationSubmitted] = useState(false);
 
   // Update handleChange for each form
   const handleUnitPlanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,10 +154,13 @@ const UnitPlansSection = () => {
     } catch (error) {
       console.error('Form submission error:', error);
     }
-    setSubmittedIndex(idx);
-    setTimeout(() => {
-      downloadRef.current?.click();
-    }, 800);
+    // Trigger download before redirecting
+    const downloadLink = document.createElement('a');
+    downloadLink.href = `/floor-plan/${getFloorPlanFile(unitPlans[idx].type)}`;
+    downloadLink.download = `${unitPlans[idx].type}-floor-plan.png`;
+    downloadLink.click();
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
   const handleAllPlansSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,10 +191,12 @@ const UnitPlansSection = () => {
     } catch (error) {
       console.error('Form submission error:', error);
     }
-    setAllPlansSubmitted(true);
-    setTimeout(() => {
-      allPlansDownloadRef.current?.click();
-    }, 800);
+    // Trigger download before redirecting
+    if (allPlansDownloadRef.current) {
+      allPlansDownloadRef.current.click();
+    }
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
   const handleConsultationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -223,24 +227,22 @@ const UnitPlansSection = () => {
     } catch (error) {
       console.error('Form submission error:', error);
     }
-    setConsultationSubmitted(true);
+    // Redirect to thank you page
+    navigate('/thank-you');
   };
 
   const closeModal = () => {
     setOpenIndex(null);
-    setTimeout(() => setSubmittedIndex(null), 300);
     setUnitPlanForm({ name: "", phone: "", email: "", consent: false });
   };
 
   const closeAllPlansModal = () => {
     setAllPlansOpen(false);
-    setTimeout(() => setAllPlansSubmitted(false), 300);
     setAllPlansForm({ name: "", phone: "", email: "", consent: false });
   };
 
   const closeConsultationModal = () => {
     setConsultationOpen(false);
-    setTimeout(() => setConsultationSubmitted(false), 300);
     setConsultationForm({ name: "", phone: "", email: "", consent: false });
   };
 
@@ -336,7 +338,7 @@ const UnitPlansSection = () => {
                   <button
                     type="button"
                     className="relative h-[50px] w-full max-w-xs flex items-center justify-center gap-2 overflow-hidden border border-[#828281] bg-white text-black shadow-2xl transition-all before:absolute before:left-0 before:right-0 before:top-0 before:h-0 before:w-full before:bg-black before:duration-500 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0 after:w-full after:bg-black after:duration-500 hover:text-white hover:shadow-black hover:before:h-2/4 hover:after:h-2/4 text-base px-8 py-5 font-semibold rounded-lg"
-                    onClick={() => { setOpenIndex(index); setUnitPlanForm({ name: "", phone: "", email: "", consent: false }); setSubmittedIndex(null); }}
+                    onClick={() => { setOpenIndex(index); setUnitPlanForm({ name: "", phone: "", email: "", consent: false }); }}
                   >
                     <span className="relative z-10 whitespace-nowrap">Schedule Visit / Download Unit Plan</span>
                   </button>
@@ -352,7 +354,7 @@ const UnitPlansSection = () => {
                         >
                           ×
                         </button>
-                        {submittedIndex !== index ? (
+
                           <form
                             id={`unitplan-download-form-${index}`}
                             className="flex flex-col gap-5"
@@ -409,26 +411,7 @@ const UnitPlansSection = () => {
                               Download Now
                             </button>
                           </form>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center min-h-[200px]">
-                            <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
-                            <p className="text-gray-700 text-center mb-4">Your details have been received.<br/>Your download will begin automatically.</p>
-                            <a
-                              ref={downloadRef}
-                              href={`/floor-plan/${getFloorPlanFile(unit.type)}`}
-                              download
-                              className="hidden"
-                            >
-                              Download
-                            </a>
-                            <button
-                              className="mt-6 bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#b82828]"
-                              onClick={closeModal}
-                            >
-                              Close
-                            </button>
-                          </div>
-                        )}
+
                       </div>
                     </div>
                   </ModalPortal>
@@ -474,7 +457,6 @@ const UnitPlansSection = () => {
                   >
                     ×
                   </button>
-                  {!allPlansSubmitted ? (
                     <form
                       id="download-all-plans-form"
                       className="flex flex-col gap-5"
@@ -531,26 +513,15 @@ const UnitPlansSection = () => {
                         Download All
                       </button>
                     </form>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center min-h-[200px]">
-                      <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
-                      <p className="text-gray-700 text-center mb-4">Your details have been received.<br/>Your download will begin automatically.</p>
-                      <a
-                        ref={allPlansDownloadRef}
-                        href="/floor-plan/all-plans.zip"
-                        download
-                        className="hidden"
-                      >
-                        Download All
-                      </a>
-                      <button
-                        className="mt-6 bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#b82828]"
-                        onClick={closeAllPlansModal}
-                      >
-                        Close
-                      </button>
-                    </div>
-                  )}
+                    {/* Hidden download link for automatic download */}
+                    <a
+                      ref={allPlansDownloadRef}
+                      href="/floor-plan/all-plans.zip"
+                      download
+                      className="hidden"
+                    >
+                      Download All
+                    </a>
                 </div>
               </div>
             </ModalPortal>
@@ -566,7 +537,6 @@ const UnitPlansSection = () => {
                   >
                     ×
                   </button>
-                  {!consultationSubmitted ? (
                     <form
                       id="schedule-consultation-form"
                       className="flex flex-col gap-5"
@@ -582,16 +552,16 @@ const UnitPlansSection = () => {
                         required
                         className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                       />
-                      <input
-                        type="tel"
-                        name="phone"
-                        placeholder="Phone Number"
-                        value={consultationForm.phone}
-                        onChange={handleConsultationChange}
-                        required
-                        pattern="[0-9]{10,}"
-                        className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
+                                              <input
+                          type="tel"
+                          name="phone"
+                          placeholder="Phone Number"
+                          value={consultationForm.phone}
+                          onChange={handleConsultationChange}
+                          required
+                          pattern="[0-9]{10,}"
+                          className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
                       {consultationFormErrors.phone && <span className="text-red-600 text-sm">{consultationFormErrors.phone}</span>}
                       <input
                         type="email"
@@ -623,18 +593,6 @@ const UnitPlansSection = () => {
                         Schedule Consultation
                       </button>
                     </form>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center min-h-[200px]">
-                      <h3 className="text-2xl font-bold text-primary mb-2">Thank You!</h3>
-                      <p className="text-gray-700 text-center mb-4">Your consultation request has been received.<br/>Our expert will reach out to you soon to help you find your perfect home. We look forward to assisting you!</p>
-                      <button
-                        className="mt-6 bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#b82828]"
-                        onClick={closeConsultationModal}
-                      >
-                        Close
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             </ModalPortal>
