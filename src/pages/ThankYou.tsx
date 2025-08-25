@@ -47,13 +47,7 @@ const ThankYou = () => {
             </Button>
           </Link>
           
-          {/* Additional Info */}
-          <p className="text-sm text-gray-300 mt-8">
-            If you have any immediate questions, feel free to call us at{" "}
-            <a href="tel:+919876543210" className="text-white font-semibold hover:underline">
-              +91 98765 43210
-            </a>
-          </p>
+
         </div>
       </div>
     </div>
