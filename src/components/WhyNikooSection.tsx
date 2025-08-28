@@ -256,7 +256,7 @@ const WhyNikooSection = () => {
             {/* Left: New Description */}
             <div className="md:pr-12">
               <p className="text-lg md:text-xl leading-relaxed text-muted-foreground font-medium">
-                Bhartiya Nikoo Garden Estate is a premium upcoming township by Bhartiya City, located in Sadahalli, North Bangalore. Surrounded by greenery, it offers a mix of smart apartments, duplexes, row houses, and villas—designed for modern urban living. Ideally located opposite Prestige Cloud Tech Park and close to the Airport Toll Gate, it ensures seamless connectivity to key IT and industrial hubs. With prices starting at <span className="text-[#CF2E2E] font-bold">₹50 Lakhs onwards*</span>, this project blends lifestyle, convenience, and long-term value. Crafted with sustainable design and world-class amenities, it’s the perfect address for those seeking a future-ready home in North Bangalore.
+                Bhartiya Nikoo Garden Estate is a premium upcoming township by Bhartiya City, located in Sadahalli, North Bangalore. Surrounded by greenery, it offers a mix of smart apartments, duplexes, row houses, and villas—designed for modern urban living. Ideally located opposite Prestige Cloud Tech Park and close to the Airport Toll Gate, it ensures seamless connectivity to key IT and industrial hubs. With prices starting at <span className="text-[#CF2E2E] font-bold">₹94 Lakhs onwards*</span>, this project blends lifestyle, convenience, and long-term value. Crafted with sustainable design and world-class amenities, it’s the perfect address for those seeking a future-ready home in North Bangalore.
               </p>
             </div>
             {/* Right: Image */}

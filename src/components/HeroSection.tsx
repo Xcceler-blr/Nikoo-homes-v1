@@ -156,7 +156,7 @@ const HeroSection = () => {
             {/* Sub-headline */}
             <p className="text-xl md:text-2xl text-primary-foreground/80 mb-8 max-w-2xl animate-fade-in">
               1, 2, 3 & 4 BHK Smart Homes Starting at{" "}
-              <span className="text-secondary font-bold text-3xl">₹50L*</span>
+              <span className="text-secondary font-bold text-3xl">₹94L*</span>
             </p>
             {/* Key Features */}
             <div className="flex flex-wrap gap-4 mb-8 animate-fade-in">

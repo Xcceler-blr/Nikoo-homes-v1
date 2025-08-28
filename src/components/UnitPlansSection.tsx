@@ -25,14 +25,14 @@ const UnitPlansSection = () => {
     {
       type: "Studio",
       size: "480 - 540 sqft",
-      price: "₹50 Lacs*",
+      price: "₹90 Lacs*",
       highlight: "Starting Price",
       image: studioImage
     },
     {
       type: "1 BHK",
       size: "750 - 800 sqft", 
-      price: "₹75 Lacs*",
+      price: "₹94 Lacs*",
       highlight: "Popular Choice",
       image: oneBhkImage
     },
